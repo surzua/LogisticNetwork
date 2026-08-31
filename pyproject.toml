@@ -18,6 +18,10 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "plotly",
+    "polars>=1.36.1",
+    "lightgbm>=4.6.0",
+    "ortools>=9.15.6755",
+    "pydeck>=0.9.3",
 ]
 
 [project.optional-dependencies]
@@ -26,4 +30,12 @@ dev = [
     "black",
     "flake8",
     "ipykernel",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.11.0",
+    "ipykernel>=6.31.0",
+    "pytest>=8.4.2",
+    "ruff>=0.16.5",
 ]
