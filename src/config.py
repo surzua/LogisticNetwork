@@ -17,11 +17,17 @@ TOPOLOGY_PATH = INTERMEDIATE_DATA_DIR / "network_topology.parquet"
 TRANSPORT_MATRIX_PATH = INTERMEDIATE_DATA_DIR / "transport_matrix.parquet"
 DEMAND_CLEAN_PATH = INTERMEDIATE_DATA_DIR / "demand_clean.parquet"
 ITEMS_METADATA_PATH = INTERMEDIATE_DATA_DIR / "items_metadata.parquet"
+MODELS_DIR = BASE_DIR / "models"
+FORECAST_OUTPUT_PATH = OUTPUT_DATA_DIR / "forecast_demand_quantiles.parquet"
 
 # ------------------------------------------------------------------------------
 # 2. REPRODUCIBILIDAD Y PARÁMETROS DE TIEMPO
 # ------------------------------------------------------------------------------
 RANDOM_SEED = 42
+
+# Parámetros de Forecasting
+QUANTILES = [0.10, 0.50, 0.90]
+FORECAST_HORIZON_DAYS = 14
 
 # Rango temporal de demanda histórica (2 años completos para capturar estacionalidad)
 SIMULATION_START_DATE = "2024-01-01"
@@ -218,4 +224,16 @@ LEAD_TIME_DAYS = {
     ("CD", "DS"): 1.0,          # Abastecimiento consolidado nocturno Next-Day (24 horas)
     ("CD", "ZONE"): 2.0,        # Despacho estándar lejano cuando la DS local quiebra stock (48 horas)
 }
+
+# ------------------------------------------------------------------------------
+# 5. PARÁMETROS DE OPTIMIZACIÓN (MILP)
+# ------------------------------------------------------------------------------
+OPTIMAL_PLAN_PATH = OUTPUT_DATA_DIR / "optimal_fulfillment_plan.parquet"
+BENCHMARK_PLAN_PATH = OUTPUT_DATA_DIR / "benchmark_fulfillment_plan.parquet"
+
+# Parámetros de inventario inicial y operación del solver
+DEFAULT_INITIAL_INVENTORY_COVERAGE_DAYS = 3  # Días de demanda media como inventario inicial en DS
+DEFAULT_CD_INBOUND_CAPACITY_FACTOR = 1.5     # Factor de abastecimiento entrante a CDs respecto a la demanda global
+DEFAULT_SOLVER_TIME_LIMIT_SECS = 120         # Límite de tiempo para CBC solver
+
 

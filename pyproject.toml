@@ -39,3 +39,12 @@ dev = [
     "pytest>=8.4.2",
     "ruff>=0.16.5",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+
