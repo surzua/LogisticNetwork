@@ -139,21 +139,25 @@ DEMAND_ZONES = {
 # ------------------------------------------------------------------------------
 # 4. PARÁMETROS DE COSTO DE TRANSPORTE Y LEAD TIME
 # ------------------------------------------------------------------------------
-# Factor de tortuosidad vial promedio en Santiago (distancia en ruta vs. Haversine)
+# Factor de tortuosidad vial promedio en Santiago (distancia en ruta vs. Haversine).
+# Literatura empírica de transporte urbano (Ballou et al. y vialidad RM) sitúa
+# la relación ruta/geodésica entre 1.25 y 1.35. Usamos 1.28 como balance metropolitano.
 CIRCUITY_FACTOR = 1.28
 
-# Costos unitarios de transporte por m3 transportado por km ($/m3·km)
+# Costos unitarios de transporte por m3 transportado por km ($ USD / m3·km)
+# Reflejan economías de escala del vehículo y fricción de última milla:
 TRANSPORT_COST_PER_M3_KM = {
-    ("CD", "DS"): 0.045,        # Camiones pesados / consolidado (económico por m3)
-    ("CD", "ZONE"): 0.120,      # Despacho directo / cross-fulfillment de emergencia desde CD
-    ("DS", "ZONE"): 0.160,      # Última milla urbana en vans / motos
-    ("DS", "DS"): 0.080,        # Rebalanceo / transbordo entre Dark Stores
+    ("CD", "DS"): 0.045,        # Camión Rampla/Pesado (40-70 m3) en autopistas: costo mínimo por m3·km
+    ("DS", "DS"): 0.080,        # Camión 3/4 o van cerrada (10-20 m3): transferencia lateral inter-hub
+    ("CD", "ZONE"): 0.120,      # Camión mediano directo / cross-fulfillment de emergencia desde CD
+    ("DS", "ZONE"): 0.160,      # Vans/furgones de última milla capilar: paradas continuas, tráfico urbano
 }
 
-# Lead time en días según tipo de arco
+# Lead time en días según tipo de arco (promesa de servicio y ciclo logístico)
 LEAD_TIME_DAYS = {
-    ("CD", "DS"): 1.0,          # Abastecimiento programado (Next-Day)
-    ("CD", "ZONE"): 2.0,        # Entrega estándar lejana
-    ("DS", "ZONE"): 0.2,        # Same-day / express última milla (horas)
-    ("DS", "DS"): 0.5,          # Transferencia inter-hub (medio día)
+    ("DS", "ZONE"): 0.2,        # Same-day express desde micro-hub urbano (~4.8 horas)
+    ("DS", "DS"): 0.5,          # Rebalanceo entre dark stores urbanas (~12 horas)
+    ("CD", "DS"): 1.0,          # Abastecimiento consolidado nocturno Next-Day (24 horas)
+    ("CD", "ZONE"): 2.0,        # Despacho estándar lejano cuando la DS local quiebra stock (48 horas)
 }
+
