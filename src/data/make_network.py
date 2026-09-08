@@ -11,6 +11,7 @@ import pandas as pd
 # Permitir ejecución tanto directa (python src/data/make_network.py) como módulo (-m src.data.make_network)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
+# pyrefly: ignore [missing-import]
 from src.config import (
     CD_NODES,
     DARK_STORE_NODES,

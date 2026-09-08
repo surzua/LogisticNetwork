@@ -12,14 +12,72 @@ RAW_DATA_DIR = DATA_DIR / "01_raw"
 INTERMEDIATE_DATA_DIR = DATA_DIR / "02_intermediate"
 OUTPUT_DATA_DIR = DATA_DIR / "03_output"
 
+RAW_SALES_PATH = RAW_DATA_DIR / "raw_sales_demand.parquet"
 TOPOLOGY_PATH = INTERMEDIATE_DATA_DIR / "network_topology.parquet"
 TRANSPORT_MATRIX_PATH = INTERMEDIATE_DATA_DIR / "transport_matrix.parquet"
 DEMAND_CLEAN_PATH = INTERMEDIATE_DATA_DIR / "demand_clean.parquet"
+ITEMS_METADATA_PATH = INTERMEDIATE_DATA_DIR / "items_metadata.parquet"
 
 # ------------------------------------------------------------------------------
-# 2. REPRODUCIBILIDAD
+# 2. REPRODUCIBILIDAD Y PARÁMETROS DE TIEMPO
 # ------------------------------------------------------------------------------
 RANDOM_SEED = 42
+
+# Rango temporal de demanda histórica (2 años completos para capturar estacionalidad)
+SIMULATION_START_DATE = "2024-01-01"
+SIMULATION_END_DATE = "2025-12-31"
+
+# ------------------------------------------------------------------------------
+# 2.1 CATÁLOGO DE PRODUCTOS (SKUs)
+# ------------------------------------------------------------------------------
+# Portafolio representativo retail/supermercado con volúmenes cúbicos y penalización por stockout
+SKU_CATALOG = {
+    "SKU_BEVERAGE_PACK": {
+        "category": "Bebidas",
+        "name": "Pack Bebidas / Aguas 6x1.5L",
+        "volume_m3": 0.015,         # 15 litros aprox.
+        "base_price": 7.50,         # USD
+        "stockout_cost": 5.00,      # Penalización por venta perdida (margen + servicio)
+        "base_daily_demand": 45,    # Demanda media diaria por zona
+        "promo_elasticity": 2.2,    # Multiplicador en promociones
+    },
+    "SKU_SNACKS_BOX": {
+        "category": "Alimentos",
+        "name": "Caja Surtida Snacks / Galletas",
+        "volume_m3": 0.008,
+        "base_price": 12.00,
+        "stockout_cost": 8.00,
+        "base_daily_demand": 35,
+        "promo_elasticity": 1.8,
+    },
+    "SKU_DAIRY_PACK": {
+        "category": "Lácteos & Refrigerados",
+        "name": "Pack Leche Larga Vida 12x1L",
+        "volume_m3": 0.014,
+        "base_price": 14.50,
+        "stockout_cost": 10.00,
+        "base_daily_demand": 50,
+        "promo_elasticity": 1.9,
+    },
+    "SKU_CLEANING_KIT": {
+        "category": "Aseo y Limpieza",
+        "name": "Kit Limpieza Hogar Multiuso",
+        "volume_m3": 0.020,
+        "base_price": 18.00,
+        "stockout_cost": 12.00,
+        "base_daily_demand": 25,
+        "promo_elasticity": 2.5,
+    },
+    "SKU_PERSONAL_CARE": {
+        "category": "Cuidado Personal",
+        "name": "Pack Higiene Personal Familiar",
+        "volume_m3": 0.006,
+        "base_price": 16.50,
+        "stockout_cost": 11.00,
+        "base_daily_demand": 30,
+        "promo_elasticity": 1.7,
+    },
+}
 
 # ------------------------------------------------------------------------------
 # 3. TOPOLOGÍA SANTIAGO DE CHILE
