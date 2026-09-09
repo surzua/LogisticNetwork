@@ -37,13 +37,8 @@ venv.bak/
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
-# Data files (keep folders, ignore data files)
-data/01_raw/*
-!data/01_raw/.gitkeep
-data/02_intermediate/*
-!data/02_intermediate/.gitkeep
-data/03_output/*
-!data/03_output/.gitkeep
+# Data files (permitir datasets procesados y resultados de referencia del proyecto)
+# data/01_raw/large_dumps/
 
 # IDEs and Editors
 .vscode/

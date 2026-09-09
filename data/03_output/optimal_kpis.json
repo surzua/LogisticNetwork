@@ -1,0 +1,17 @@
+{
+  "status": "Optimal",
+  "solve_time_seconds": 0.27,
+  "total_cost": 2980.18,
+  "fulfillment_transport_cost": 764.34,
+  "replenishment_transport_cost": 749.49,
+  "total_transport_cost": 1513.83,
+  "holding_cost": 1466.35,
+  "stockout_cost": 0.0,
+  "total_demand_units": 94204.3,
+  "fulfilled_units": 94204.3,
+  "stockout_units": 0.0,
+  "otif_pct": 100.0,
+  "cross_fulfillment_units": 6930.1,
+  "cross_fulfillment_rate_pct": 7.36,
+  "avg_ds_utilization_pct": 0.16
+}

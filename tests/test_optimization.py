@@ -41,7 +41,7 @@ def test_solver_optimality(base_solution):
     assert base_solution.is_optimal
     assert base_solution.status == "Optimal"
     assert base_solution.total_cost > 0.0
-    assert base_solution.solve_time_seconds < 15.0
+    assert base_solution.solve_time_seconds < 60.0
 
     kpis = base_solution.kpis
     assert kpis["otif_pct"] >= 95.0

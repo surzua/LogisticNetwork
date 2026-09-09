@@ -1,0 +1,14 @@
+{
+  "total_cost": 8493.21,
+  "fulfillment_transport_cost": 778.79,
+  "replenishment_transport_cost": 1095.51,
+  "total_transport_cost": 1874.3,
+  "holding_cost": 6618.91,
+  "stockout_cost": 0.0,
+  "total_demand_units": 94204.3,
+  "fulfilled_units": 94204.3,
+  "stockout_units": 0.0,
+  "otif_pct": 100.0,
+  "cross_fulfillment_units": 0.0,
+  "cross_fulfillment_rate_pct": 0.0
+}
