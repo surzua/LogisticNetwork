@@ -7,7 +7,9 @@
 [![Optimization](https://img.shields.io/badge/solver-PuLP%20%7C%20CBC-green.svg)](https://coin-or.github.io/pulp/)
 [![Forecasting](https://img.shields.io/badge/ML-LightGBM%20Quantiles-orange.svg)](https://lightgbm.readthedocs.io/)
 [![UI](https://img.shields.io/badge/dashboard-Streamlit%20%2B%20PyDeck-red.svg)](https://streamlit.io/)
-[![Tests](https://img.shields.io/badge/tests-23%20passed-brightgreen.svg)](https://docs.pytest.org/)
+[![Tests](https://img.shields.io/badge/tests-24%20passed-brightgreen.svg)](https://docs.pytest.org/)
+[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blue.svg)](https://github.com/)
+[![Docker](https://img.shields.io/badge/container-Docker-2496ED.svg)](https://www.docker.com/)
 
 ---
 
@@ -79,6 +81,9 @@ El proyecto valida empíricamente las tres hipótesis de optimización de redes 
 
 ```text
 LogisticNetwork/
+├── .github/
+│   └── workflows/
+│       └── ci.yml               # Pipeline automatizado de CI/CD (Pytest + Ruff)
 ├── app/
 │   ├── app.py                   # Aplicación interactiva Streamlit
 │   └── components.py            # Componentes PyDeck, Plotly y simulación
@@ -90,19 +95,27 @@ LogisticNetwork/
 │   ├── NETWORK_ASSUMPTIONS.md   # Supuestos de topología y vialidad urbana
 │   └── PROJECT_SPEC.md          # Especificación formal del proyecto
 ├── models/                      # Modelos entrenados LightGBM (P10, P50, P90)
-├── notebooks/                   # Notebooks de análisis exploratorio
+├── notebooks/                   # Notebooks de análisis y prototipado
+│   ├── 01_eda_demand.ipynb
+│   ├── 02_feature_engineering.ipynb
+│   ├── 03_forecasting_models.ipynb
+│   └── 04_prototype_optimization.ipynb
 ├── src/
 │   ├── config.py                # Coordenadas, costos unitarios y constantes
 │   ├── data/                    # Ingesta, topología y feature engineering
-│   ├── forecasting/             # Entrenamiento por cuantiles y Pinball Loss
-│   └── optimization/            # Modelos matemáticos PuLP, solver y benchmark
-├── tests/                       # Suite de pruebas unitarias (23 tests)
+│   ├── forecasting/             # Modelado por cuantiles (P10, P50, P90)
+│   ├── optimization/            # Modelo MILP en PuLP, solver y benchmark naive
+│   └── utils/
+│       └── metrics.py           # Métricas Pinball Loss, WAPE, RMSE, OTIF
+├── tests/                       # Suite de pruebas unitarias (24 tests)
 │   ├── test_features.py
 │   ├── test_forecasting.py
 │   ├── test_optimization.py
 │   └── test_app.py
-├── Makefile                     # Automatización de flujos de trabajo
-└── pyproject.toml               # Gestión moderna de dependencias (uv / pip)
+├── Dockerfile                   # Imagen Docker con solver CBC y Streamlit
+├── .dockerignore                # Reglas de exclusión para contenedores
+├── Makefile                     # Automatización de tareas de desarrollo
+└── pyproject.toml               # Configuración del proyecto y dependencias
 ```
 
 ---
@@ -111,7 +124,7 @@ LogisticNetwork/
 
 ### Requisitos Previos
 * Python $\ge 3.11$
-* Gestor de paquetes [`uv`](https://github.com/astral-sh/uv) (o `pip`)
+* Gestor de paquetes [`uv`](https://github.com/astral-sh/uv) (o `pip`) / Docker
 
 ### 1. Clonar el repositorio y configurar el entorno
 ```bash
@@ -145,6 +158,16 @@ uv run streamlit run app/app.py
 make run-app
 ```
 Acceder en el navegador a `http://localhost:8501`.
+
+### 5. Ejecución Contenerizada con Docker
+```bash
+# Construir la imagen Docker
+make docker-build
+
+# Iniciar el contenedor con el dashboard
+make docker-run
+```
+Acceder a `http://localhost:8501`.
 
 ---
 

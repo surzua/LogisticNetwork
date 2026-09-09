@@ -21,30 +21,7 @@ from src.config import (
     RANDOM_SEED,
 )
 from src.data.features import build_feature_pipeline
-
-
-def pinball_loss(y_true: np.ndarray, y_pred: np.ndarray, alpha: float) -> float:
-    """
-    Calcula la pérdida Pinball Loss (Quantile Loss) para un cuantil alpha dado.
-    
-    L_alpha(y, y_hat) = max(alpha * (y - y_hat), (alpha - 1) * (y - y_hat))
-    """
-    diff = np.asarray(y_true) - np.asarray(y_pred)
-    loss = np.maximum(alpha * diff, (alpha - 1.0) * diff)
-    return float(np.mean(loss))
-
-
-def wape_metric(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    """
-    Calcula el Weighted Absolute Percentage Error (WAPE).
-    WAPE = sum(|y - y_hat|) / sum(y) * 100
-    """
-    y_true = np.asarray(y_true)
-    y_pred = np.asarray(y_pred)
-    total_y = np.sum(y_true)
-    if total_y == 0:
-        return 0.0
-    return float(np.sum(np.abs(y_true - y_pred)) / total_y * 100.0)
+from src.utils.metrics import pinball_loss, wape_metric
 
 
 def enforce_monotonicity(preds_dict: Dict[float, np.ndarray]) -> Dict[float, np.ndarray]:

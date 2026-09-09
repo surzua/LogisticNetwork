@@ -8,9 +8,14 @@ import pandas as pd
 import pytest
 
 from src.config import FORECAST_OUTPUT_PATH
-from src.forecasting.train import (
+from src.utils.metrics import (
     pinball_loss,
     wape_metric,
+    mae_metric,
+    rmse_metric,
+    service_level_otif,
+)
+from src.forecasting.train import (
     enforce_monotonicity,
     QuantileForecaster,
     evaluate_forecasts,
@@ -40,6 +45,20 @@ def test_wape_metric():
     y_true = np.array([100.0, 200.0])
     y_pred = np.array([90.0, 220.0])  # abs err = 10 + 20 = 30; sum(y) = 300
     assert np.isclose(wape_metric(y_true, y_pred), 10.0)
+
+
+def test_additional_metrics_mae_rmse_otif():
+    y_true = np.array([10.0, 20.0, 30.0])
+    y_pred = np.array([12.0, 18.0, 30.0])
+
+    assert np.isclose(mae_metric(y_true, y_pred), 4.0 / 3.0)
+    assert np.isclose(rmse_metric(y_true, y_pred), np.sqrt(8.0 / 3.0))
+
+    # OTIF: Demanda total = 100, despachado = 90 -> 90%
+    demand = np.array([50.0, 50.0])
+    fulfilled = np.array([50.0, 40.0])
+    assert np.isclose(service_level_otif(demand, fulfilled), 90.0)
+    assert np.isclose(service_level_otif(np.array([0.0]), np.array([0.0])), 100.0)
 
 
 def test_enforce_monotonicity_and_non_negativity():
