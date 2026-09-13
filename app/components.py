@@ -203,6 +203,43 @@ def prepare_map_layers_data(
     max_units = flows["units"].max() if not flows.empty and flows["units"].max() > 0 else 1.0
     flows["stroke_width"] = (flows["units"] / max_units * 5.0 + 1.5).round(1)
 
+    # Mapear nombres amigables de origen y destino
+    name_map = {}
+    for nid, d in CD_NODES.items():
+        name_map[nid] = d["name"]
+    for nid, d in DARK_STORE_NODES.items():
+        name_map[nid] = d["name"]
+    for zid, d in DEMAND_ZONES.items():
+        name_map[zid] = d["name"]
+
+    flows["from_name"] = flows["from_node_id"].map(lambda x: name_map.get(x, x))
+    flows["to_name"] = flows["to_zone_id"].map(lambda x: name_map.get(x, x))
+
+    def make_flow_tooltip(row):
+        is_cross = bool(row["is_cross_fulfillment"])
+        badge_bg = "rgba(255, 109, 0, 0.2)" if is_cross else "rgba(0, 230, 118, 0.2)"
+        badge_color = "#FF9100" if is_cross else "#00E676"
+        badge_text = "Cross-Fulfillment (Respaldo CD)" if is_cross else "Despacho Directo Local (Dark Store)"
+
+        return f"""
+        <div style="font-family: sans-serif; font-size: 12px; color: #fff; background: rgba(18,22,31,0.95); padding: 10px 14px; border-radius: 8px; border: 1px solid #3A475C; box-shadow: 0 4px 12px rgba(0,0,0,0.4); line-height: 1.5;">
+            <div style="font-weight: 700; font-size: 12px; color: #60A5FA; margin-bottom: 4px;">🚚 Ruta de Despacho</div>
+            <div style="font-size: 13px; font-weight: 700; color: #F3F4F6; margin-bottom: 6px;">
+                {row['from_name']} <span style="color: #9CA3AF;">➔</span> {row['to_name']}
+            </div>
+            <div style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; background: {badge_bg}; color: {badge_color}; margin-bottom: 6px;">
+                {badge_text}
+            </div>
+            <div style="color: #D1D5DB; font-size: 11px;">
+                <b>• Despacho:</b> {row['units']:,.0f} unidades ({row['volume_m3']:.2f} m³)<br/>
+                <b>• Distancia:</b> {row['distance_km']:.1f} km<br/>
+                <b>• Costo transporte estimado:</b> ${row['transport_cost']:,.2f} USD
+            </div>
+        </div>
+        """
+
+    flows["tooltip_html"] = flows.apply(make_flow_tooltip, axis=1)
+
     return flows
 
 
@@ -215,7 +252,7 @@ def create_network_map(
     """
     Construye la visualización cartográfica completa con PyDeck.
     Combina capas de Nodos CDs, Dark Stores (activas/inactivas), Zonas de demanda
-    y Arcos de despacho volumétrico 3D.
+    y Arcos de despacho volumétrico 3D con tooltips contextuales enriquecidos.
     """
     disabled_set = set(disabled_nodes or [])
 
@@ -235,8 +272,37 @@ def create_network_map(
             return 800
         return 500
 
+    def make_node_tooltip(row):
+        is_cd = row["node_type"] == "CD"
+        type_name = "Centro de Distribución (CD)" if is_cd else "Dark Store Urbana (Bodega Express)"
+        badge_bg = "rgba(33, 150, 243, 0.2)" if is_cd else "rgba(0, 230, 118, 0.2)"
+        badge_color = "#60A5FA" if is_cd else "#00E676"
+        status_html = (
+            '<span style="color: #EF4444; font-weight: 700;">🔴 Inhabilitada por Contingencia</span>'
+            if row["is_disabled"]
+            else '<span style="color: #10B981; font-weight: 600;">🟢 En Operación Normal</span>'
+        )
+
+        return f"""
+        <div style="font-family: sans-serif; font-size: 12px; color: #fff; background: rgba(18,22,31,0.95); padding: 10px 14px; border-radius: 8px; border: 1px solid #3A475C; box-shadow: 0 4px 12px rgba(0,0,0,0.4); line-height: 1.5;">
+            <div style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; background: {badge_bg}; color: {badge_color}; margin-bottom: 6px;">
+                {type_name}
+            </div>
+            <div style="font-size: 14px; font-weight: 700; color: #F3F4F6; margin-bottom: 4px;">
+                {row['node_name']}
+            </div>
+            <div style="color: #9CA3AF; font-size: 11px; margin-bottom: 6px;">Código interno: {row['node_id']}</div>
+            <div style="color: #D1D5DB; font-size: 11px;">
+                <b>• Estado:</b> {status_html}<br/>
+                <b>• Capacidad total de almacenamiento:</b> {row['capacity_m3']:,.0f} m³<br/>
+                <b>• Costo de bodegaje:</b> ${row['holding_cost_unit']:.2f} USD por m³/día
+            </div>
+        </div>
+        """
+
     nodes_df["color"] = nodes_df.apply(node_color, axis=1)
     nodes_df["radius"] = nodes_df.apply(node_radius, axis=1)
+    nodes_df["tooltip_html"] = nodes_df.apply(make_node_tooltip, axis=1)
 
     # Capa 1: Nodos de Suministro (CDs y Dark Stores)
     supply_layer = pdk.Layer(
@@ -253,6 +319,24 @@ def create_network_map(
     zones_plot_df = zones_df.copy()
     zones_plot_df["color"] = [[255, 179, 0, 180] for _ in range(len(zones_plot_df))]
     zones_plot_df["radius"] = 350
+
+    def make_zone_tooltip(row):
+        return f"""
+        <div style="font-family: sans-serif; font-size: 12px; color: #fff; background: rgba(18,22,31,0.95); padding: 10px 14px; border-radius: 8px; border: 1px solid #3A475C; box-shadow: 0 4px 12px rgba(0,0,0,0.4); line-height: 1.5;">
+            <div style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; background: rgba(245, 158, 11, 0.2); color: #FBBF24; margin-bottom: 6px;">
+                📍 Zona de Demanda (Clientes)
+            </div>
+            <div style="font-size: 14px; font-weight: 700; color: #F3F4F6; margin-bottom: 4px;">
+                {row['zone_name']}
+            </div>
+            <div style="color: #9CA3AF; font-size: 11px; margin-bottom: 4px;">Código de zona: {row['zone_id']}</div>
+            <div style="color: #D1D5DB; font-size: 11px;">
+                Comuna o sector de clientes finales en el Gran Santiago.
+            </div>
+        </div>
+        """
+
+    zones_plot_df["tooltip_html"] = zones_plot_df.apply(make_zone_tooltip, axis=1)
 
     zones_layer = pdk.Layer(
         "ScatterplotLayer",
@@ -291,17 +375,7 @@ def create_network_map(
     )
 
     tooltip = {
-        "html": """
-        <div style="font-family: sans-serif; font-size: 12px; color: #fff; background: rgba(20,25,35,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid #444;">
-            <b>{node_name}</b> {zone_name} <br/>
-            <span><b>ID:</b> {node_id}{zone_id}</span><br/>
-            <span><b>Tipo:</b> {node_type}</span><br/>
-            <span><b>Capacidad:</b> {capacity_m3} m³</span><br/>
-            <span><b>Despacho:</b> {units} unid. ({volume_m3} m³)</span><br/>
-            <span><b>Ruta:</b> {from_node_id} ➔ {to_zone_id}</span><br/>
-            <span><b>Distancia:</b> {distance_km} km</span>
-        </div>
-        """,
+        "html": "{tooltip_html}",
         "style": {"backgroundColor": "transparent", "color": "white"},
     }
 

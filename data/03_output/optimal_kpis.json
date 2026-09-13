@@ -1,6 +1,6 @@
 {
   "status": "Optimal",
-  "solve_time_seconds": 0.27,
+  "solve_time_seconds": 0.256,
   "total_cost": 2980.18,
   "fulfillment_transport_cost": 764.34,
   "replenishment_transport_cost": 749.49,
