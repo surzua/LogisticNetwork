@@ -25,7 +25,7 @@ Los CDs están ubicados en los dos polos logísticos e industriales más consoli
 | Nodo ID | Ubicación Real | Comuna | Justificación Territorial | Capacidad ($m^3$) | Costo Almacenamiento ($/m^3 \cdot \text{día}$) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `CD_PUDAHUEL` | Parque de Negocios Enea / Aeropuerto | Pudahuel | Polo logístico e industrial consolidado del poniente. Salida inmediata a Autopista Costanera Norte y Vespucio Norte. | $25.000$ | $\$0.40$ |
-| `CD_SAN_BERNARDO` | Eje Panamericana Sur / Nos | San Bernardo | Polo de grandes centros de distribución del sur (ej. Walmart El Peñón, CCU, Falabella). Acceso a Autopista Central / Ruta 5 Sur. | $30.000$ | $\$0.35$ |
+| `CD_SAN_BERNARDO` | Eje Panamericana Sur / Nos | San Bernardo | Polo de grandes centros de distribución del sur (ej. Walmart El Peñón, CCU, grandes retailers e-commerce). Acceso a Autopista Central / Ruta 5 Sur. | $30.000$ | $\$0.35$ |
 
 #### Fundamento de los Parámetros:
 * **Capacidades ($25.000 - 30.000\ m^3$):** Corresponden a naves industriales Clase A de aproximadamente $3.500\text{ a }4.500\ m^2$ con racks de $7\text{ a }8$ metros de altura útil.
